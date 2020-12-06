@@ -134,6 +134,29 @@ addEventListener("load", () => {
 })
 ```
 
+## Lazy load all components
+```javascript
+// app/javascript/packs/index.js
+import Vue from "vue"
+// require.cnotext can find all .vue files inside app/javascript recursively
+const files = require.context("../", true, /\.vue$/i)
+files.keys().map(key => {
+  const component = key.split('/').pop().split('.')[0]
+  const modulePath = key.replace(/^\.\//, "")
+  
+  Vue.component(component, () => import(`../${modulePath}`))
+  // or without lazyloading
+  // Vue.component(component, files[key].default)
+})
+
+import RenderVueComponent from "render-vue-component"
+RenderVueComponent.setVue(Vue)
+
+addEventListener("load", () => {
+  RenderVueComponent.renderComponentsOnRails()
+})
+```
+
 ## Custom Serializer
 
 In fact, render_vue_component just render the data to DOM first and use JS to parse them.
